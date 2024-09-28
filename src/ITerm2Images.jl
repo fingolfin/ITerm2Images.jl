@@ -37,8 +37,10 @@ const MIMEImageType = Union{[MIME{Symbol(tp)} for tp in imagetypes]...}
 # instead of TMUX because TERM gets passed through ssh.
 
 function istmux()
-    term = get(ENV, "TERM", "")
-    return startswith(term, "screen") || startswith(term, "tmux")
+    # From the tmux manpage: "tmux also initialises the TMUX variable with some
+    # internal information". The presence of this variable is a pretty reliable
+    # indicator that we're inside tmux.
+    return haskey(ENV, "TMUX")
 end
 
 OSC() = istmux() ? "\ePtmux;\e\e]" : "\e]"
